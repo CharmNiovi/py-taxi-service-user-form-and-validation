@@ -80,6 +80,16 @@ class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("taxi:car-list")
 
 
+class CarAssignView(LoginRequiredMixin, generic.RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse_lazy("taxi:car-detail", kwargs={"pk": kwargs["pk"]})
+
+    def get(self, request, *args, **kwargs):
+        car = Car.objects.get(pk=kwargs["pk"])
+        car.drivers.add(request.user)
+        return super().get(request, *args, **kwargs)
+
+
 class DriverListView(LoginRequiredMixin, generic.ListView):
     model = Driver
     paginate_by = 5
